@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: docker.io/focasoftware/mongodb-secure:4.4@sha256:de63b28bb260b7669015370cd6fd8a73c6508a3afc4d854acfeaf65d1dc32e05
+    container_name: mongodb-secure
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+      - /var/log/mongodb
+
+  api:
+    image: docker.io/focasoftware/api-secure:3.0@sha256:2b663897e760a4f8f4abd23daa2afa666df2abb136c742d0e98092db06fa015e
+    container_name: api-secure
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${PORT}
+      MONGODB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/${MONGO_INITDB_DATABASE}?authSource=admin
+      FRONTEND_URL: ${FRONTEND_URL}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+
+  frontend:
+    image: docker.io/focasoftware/frontend-secure:5.3@sha256:9734e83e23a75dddc9ee16d4f8f441f120cf43adff8c289ac7f100100bcef7fd
+    container_name: frontend-secure
+    environment:
+      FRONTEND_URL: ${FRONTEND_URL}
+    ports:
+      - "8888:80"
+    depends_on:
+      - api
+    networks:
+      - app-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /var/log/nginx
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
