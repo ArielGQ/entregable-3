@@ -47,7 +47,7 @@ FRONTEND_URL=http://localhost:80
 1. **Situarte en el directorio:**
 
 ```bash
-cd ENTREGABLE-3
+cd entregable-3
 ```
 
 2. **Crear el archivo `.env`** (si aún no existe), usando como base el ejemplo anterior y ajustando los valores a tu caso.
@@ -104,7 +104,7 @@ Sustituye las variables por los valores que configuraste en tu `.env`.
 
 Una vez que los contenedores están levantados con `docker compose up -d` y accedes a `http://localhost:8888`, la aplicación se ve así:
 
-![Aplicación en ejecución](ENTREGABLE-3/todoseguro.png)
+![Aplicación en ejecución](img/todoseguro.png)
 
 ---
 
